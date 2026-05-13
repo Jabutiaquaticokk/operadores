@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operadores em JavaScript</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #f7c948;
+    --accent2: #4ff0b7;
+    --accent3: #ff6b6b;
+    --accent4: #7c6dfa;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --code-bg: #0d0d15;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(247,201,72,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(247,201,72,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 56px;
+    overflow-x: auto;
+  }
+
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--accent); }
+  nav .logo {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin-right: auto;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(247,201,72,0.12) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; }
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    border: 1px solid rgba(247,201,72,0.3);
+    padding: 0.3rem 1rem;
+    border-radius: 999px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.15em;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    max-width: 560px;
+    line-height: 1.7;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-symbols {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: 800;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .hero-symbols span {
+    color: var(--muted);
+    transition: color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  .hero-symbols span:hover { color: var(--accent); transform: scale(1.3) rotate(-5deg); }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+    line-height: 1.1;
+  }
+
+  .section-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  /* ── OPERATOR CARDS ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s;
+    cursor: default;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .card:hover {
+    border-color: var(--card-accent, var(--accent));
+    transform: translateY(-4px);
+  }
+  .card:hover::before { transform: scaleX(1); }
+
+  .card-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--card-accent, var(--accent));
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-desc {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .card-code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .card-code .kw { color: #c792ea; }
+  .card-code .val { color: var(--accent2); }
+  .card-code .op { color: var(--accent); }
+  .card-code .cmt { color: var(--muted); }
+  .card-code .str { color: #f07178; }
+
+  /* ── TABLE SECTION ── */
+  .op-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+  }
+
+  thead th {
+    background: var(--surface);
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(247,201,72,0.04); }
+
+  tbody td {
+    padding: 0.85rem 1.25rem;
+    vertical-align: middle;
+  }
+
+  .sym { color: var(--accent); font-weight: 600; font-size: 1rem; }
+  .name { color: var(--text); }
+  .example { color: var(--accent2); }
+  .result { color: var(--accent3); }
+
+  /* ── INTERACTIVE PLAYGROUND ── */
+  .playground {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .playground-header {
+    background: var(--code-bg);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+
+  .playground-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-left: 0.5rem;
+  }
+
+  .playground-body {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .playground-body { grid-template-columns: 1fr; }
+  }
+
+  .play-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.08em;
+  }
+
+  .play-group select,
+  .play-group input {
+    width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .play-group select:focus,
+  .play-group input:focus {
+    border-color: var(--accent);
+  }
+
+  .play-result {
+    grid-column: 1 / -1;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    min-height: 80px;
+  }
+
+  .play-result .expr { color: var(--muted); font-size: 0.78rem; margin-bottom: 0.4rem; }
+  .play-result .out { color: var(--accent); font-size: 1.2rem; font-weight: 600; }
+  .play-result .type { color: var(--muted); font-size: 0.72rem; margin-top: 0.3rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  footer span { color: var(--accent); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    position: relative;
+    z-index: 1;
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">JS{ }</span>
+  <a href="#aritmeticos">Aritméticos</a>
+  <a href="#atribuicao">Atribuição</a>
+  <a href="#comparacao">Comparação</a>
+  <a href="#logicos">Lógicos</a>
+  <a href="#outros">Outros</a>
+  <a href="#playground">Playground</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag">// Guia de Referência</div>
+  <h1>Operadores em<br><span>JavaScript</span></h1>
+  <p class="hero-sub">
+    Tudo sobre operadores: aritméticos, de atribuição, comparação, lógicos e muito mais. Com exemplos de código e playground interativo.
+  </p>
+  <div class="hero-symbols">
+    <span>+</span><span>-</span><span>*</span><span>/</span><span>%</span>
+    <span>&&</span><span>||</span><span>??</span><span>===</span>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ARITMÉTICOS -->
+<section class="section" id="aritmeticos">
+  <div class="reveal">
+    <div class="section-label">// 01</div>
+    <h2 class="section-title">Operadores <em>Aritméticos</em></h2>
+  </div>
+  <div class="cards">
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">+</span>
+      <div class="card-name">Adição</div>
+      <div class="card-desc">Soma dois valores numéricos ou concatena strings.</div>
+      <div class="card-code">
+        <span class="kw">let</span> a <span class="op">=</span> <span class="val">10</span> <span class="op">+</span> <span class="val">5</span>;  <span class="cmt">// 15</span><br>
+        <span class="kw">let</span> b <span class="op">=</span> <span class="str">"Olá"</span> <span class="op">+</span> <span class="str">" JS"</span>; <span class="cmt">// "Olá JS"</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">-</span>
+      <div class="card-name">Subtração</div>
+      <div class="card-desc">Subtrai o segundo operando do primeiro.</div>
+      <div class="card-code">
+        <span class="kw">let</span> a <span class="op">=</span> <span class="val">10</span> <span class="op">-</span> <span class="val">3</span>;  <span class="cmt">// 7</span><br>
+        <span class="kw">let</span> b <span class="op">=</span> <span class="val">0</span> <span class="op">-</span> <span class="val">5</span>;   <span class="cmt">// -5</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #7c6dfa">
+      <span class="card-symbol">*</span>
+      <div class="card-name">Multiplicação</div>
+      <div class="card-desc">Multiplica dois valores numéricos.</div>
+      <div class="card-code">
+        <span class="kw">let</span> a <span class="op">=</span> <span class="val">4</span> <span class="op">*</span> <span class="val">3</span>;  <span class="cmt">// 12</span><br>
+        <span class="kw">let</span> b <span class="op">=</span> <span class="val">2.5</span> <span class="op">*</span> <span class="val">2</span>; <span class="cmt">// 5</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #ff6b6b">
+      <span class="card-symbol">/</span>
+      <div class="card-name">Divisão</div>
+      <div class="card-desc">Divide o primeiro operando pelo segundo.</div>
+      <div class="card-code">
+        <span class="kw">let</span> a <span class="op">=</span> <span class="val">10</span> <span class="op">/</span> <span class="val">2</span>;  <span class="cmt">// 5</span><br>
+        <span class="kw">let</span> b <span class="op">=</span> <span class="val">7</span> <span class="op">/</span> <span class="val">2</span>;   <span class="cmt">// 3.5</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">%</span>
+      <div class="card-name">Módulo (Resto)</div>
+      <div class="card-desc">Retorna o resto da divisão inteira entre dois números.</div>
+      <div class="card-code">
+        <span class="kw">let</span> a <span class="op">=</span> <span class="val">10</span> <span class="op">%</span> <span class="val">3</span>; <span class="cmt">// 1</span><br>
+        <span class="kw">let</span> b <span class="op">=</span> <span class="val">8</span> <span class="op">%</span> <span class="val">4</span>;  <span class="cmt">// 0</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">**</span>
+      <div class="card-name">Exponenciação</div>
+      <div class="card-desc">Eleva o primeiro operando à potência do segundo (ES2016+).</div>
+      <div class="card-code">
+        <span class="kw">let</span> a <span class="op">=</span> <span class="val">2</span> <span class="op">**</span> <span class="val">8</span>; <span class="cmt">// 256</span><br>
+        <span class="kw">let</span> b <span class="op">=</span> <span class="val">3</span> <span class="op">**</span> <span class="val">3</span>; <span class="cmt">// 27</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #7c6dfa">
+      <span class="card-symbol">++</span>
+      <div class="card-name">Incremento</div>
+      <div class="card-desc">Incrementa o valor em 1. Pode ser prefixo (++x) ou sufixo (x++).</div>
+      <div class="card-code">
+        <span class="kw">let</span> x <span class="op">=</span> <span class="val">5</span>;<br>
+        x<span class="op">++</span>; <span class="cmt">// x agora é 6</span><br>
+        <span class="op">++</span>x; <span class="cmt">// x agora é 7</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #ff6b6b">
+      <span class="card-symbol">--</span>
+      <div class="card-name">Decremento</div>
+      <div class="card-desc">Decrementa o valor em 1. Pode ser prefixo (--x) ou sufixo (x--).</div>
+      <div class="card-code">
+        <span class="kw">let</span> x <span class="op">=</span> <span class="val">5</span>;<br>
+        x<span class="op">--</span>; <span class="cmt">// x agora é 4</span><br>
+        <span class="op">--</span>x; <span class="cmt">// x agora é 3</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ATRIBUIÇÃO -->
+<section class="section" id="atribuicao">
+  <div class="reveal">
+    <div class="section-label">// 02</div>
+    <h2 class="section-title">Operadores de <em>Atribuição</em></h2>
+  </div>
+  <div class="op-table-wrap reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>Operador</th>
+          <th>Nome</th>
+          <th>Exemplo</th>
+          <th>Equivalente a</th>
+          <th>Resultado (x=10)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="sym">=</td><td class="name">Atribuição simples</td><td class="example">x = 5</td><td class="example">x = 5</td><td class="result">5</td></tr>
+        <tr><td class="sym">+=</td><td class="name">Adição e atribuição</td><td class="example">x += 3</td><td class="example">x = x + 3</td><td class="result">13</td></tr>
+        <tr><td class="sym">-=</td><td class="name">Subtração e atribuição</td><td class="example">x -= 4</td><td class="example">x = x - 4</td><td class="result">6</td></tr>
+        <tr><td class="sym">*=</td><td class="name">Multiplicação e atribuição</td><td class="example">x *= 2</td><td class="example">x = x * 2</td><td class="result">20</td></tr>
+        <tr><td class="sym">/=</td><td class="name">Divisão e atribuição</td><td class="example">x /= 5</td><td class="example">x = x / 5</td><td class="result">2</td></tr>
+        <tr><td class="sym">%=</td><td class="name">Módulo e atribuição</td><td class="example">x %= 3</td><td class="example">x = x % 3</td><td class="result">1</td></tr>
+        <tr><td class="sym">**=</td><td class="name">Exponenciação e atribuição</td><td class="example">x **= 2</td><td class="example">x = x ** 2</td><td class="result">100</td></tr>
+        <tr><td class="sym">??=</td><td class="name">Nullish e atribuição</td><td class="example">x ??= 5</td><td class="example">x = x ?? 5</td><td class="result">10</td></tr>
+        <tr><td class="sym">&&=</td><td class="name">AND lógico e atribuição</td><td class="example">x &&= 2</td><td class="example">x && (x = 2)</td><td class="result">2</td></tr>
+        <tr><td class="sym">||=</td><td class="name">OR lógico e atribuição</td><td class="example">x ||= 5</td><td class="example">x || (x = 5)</td><td class="result">10</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- COMPARAÇÃO -->
+<section class="section" id="comparacao">
+  <div class="reveal">
+    <div class="section-label">// 03</div>
+    <h2 class="section-title">Operadores de <em>Comparação</em></h2>
+  </div>
+  <div class="cards">
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">==</span>
+      <div class="card-name">Igualdade (solta)</div>
+      <div class="card-desc">Compara valores após conversão de tipo (coerção). Evite usar — prefira ===.</div>
+      <div class="card-code">
+        <span class="val">5</span> <span class="op">==</span> <span class="str">"5"</span>   <span class="cmt">// true ⚠️</span><br>
+        <span class="val">0</span> <span class="op">==</span> <span class="kw">false</span> <span class="cmt">// true ⚠️</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">===</span>
+      <div class="card-name">Igualdade estrita</div>
+      <div class="card-desc">Compara valor E tipo, sem coerção. Recomendado sempre.</div>
+      <div class="card-code">
+        <span class="val">5</span> <span class="op">===</span> <span class="val">5</span>   <span class="cmt">// true ✓</span><br>
+        <span class="val">5</span> <span class="op">===</span> <span class="str">"5"</span> <span class="cmt">// false ✓</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #ff6b6b">
+      <span class="card-symbol">!=</span>
+      <div class="card-name">Desigualdade (solta)</div>
+      <div class="card-desc">Retorna true se os valores são diferentes, com coerção de tipo.</div>
+      <div class="card-code">
+        <span class="val">5</span> <span class="op">!=</span> <span class="val">3</span>    <span class="cmt">// true</span><br>
+        <span class="val">5</span> <span class="op">!=</span> <span class="str">"5"</span>  <span class="cmt">// false ⚠️</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #7c6dfa">
+      <span class="card-symbol">!==</span>
+      <div class="card-name">Desigualdade estrita</div>
+      <div class="card-desc">Retorna true se valor OU tipo são diferentes. Recomendado.</div>
+      <div class="card-code">
+        <span class="val">5</span> <span class="op">!==</span> <span class="str">"5"</span> <span class="cmt">// true ✓</span><br>
+        <span class="val">5</span> <span class="op">!==</span> <span class="val">5</span>   <span class="cmt">// false ✓</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">&gt;</span>
+      <div class="card-name">Maior que</div>
+      <div class="card-desc">Verdadeiro se o operando esquerdo é maior que o direito.</div>
+      <div class="card-code">
+        <span class="val">10</span> <span class="op">&gt;</span> <span class="val">5</span>  <span class="cmt">// true</span><br>
+        <span class="val">3</span> <span class="op">&gt;</span> <span class="val">8</span>   <span class="cmt">// false</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">&gt;=</span>
+      <div class="card-name">Maior ou igual</div>
+      <div class="card-desc">Verdadeiro se esquerdo é maior ou igual ao direito.</div>
+      <div class="card-code">
+        <span class="val">5</span> <span class="op">&gt;=</span> <span class="val">5</span> <span class="cmt">// true</span><br>
+        <span class="val">4</span> <span class="op">&gt;=</span> <span class="val">5</span> <span class="cmt">// false</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #ff6b6b">
+      <span class="card-symbol">&lt;</span>
+      <div class="card-name">Menor que</div>
+      <div class="card-desc">Verdadeiro se o operando esquerdo é menor que o direito.</div>
+      <div class="card-code">
+        <span class="val">3</span> <span class="op">&lt;</span> <span class="val">8</span>  <span class="cmt">// true</span><br>
+        <span class="val">9</span> <span class="op">&lt;</span> <span class="val">4</span>  <span class="cmt">// false</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #7c6dfa">
+      <span class="card-symbol">&lt;=</span>
+      <div class="card-name">Menor ou igual</div>
+      <div class="card-desc">Verdadeiro se esquerdo é menor ou igual ao direito.</div>
+      <div class="card-code">
+        <span class="val">5</span> <span class="op">&lt;=</span> <span class="val">5</span> <span class="cmt">// true</span><br>
+        <span class="val">6</span> <span class="op">&lt;=</span> <span class="val">5</span> <span class="cmt">// false</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- LÓGICOS -->
+<section class="section" id="logicos">
+  <div class="reveal">
+    <div class="section-label">// 04</div>
+    <h2 class="section-title">Operadores <em>Lógicos</em></h2>
+  </div>
+  <div class="cards">
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">&&</span>
+      <div class="card-name">AND (E lógico)</div>
+      <div class="card-desc">Retorna o primeiro valor falsy ou o último valor se todos forem truthy.</div>
+      <div class="card-code">
+        <span class="kw">true</span> <span class="op">&&</span> <span class="kw">true</span>    <span class="cmt">// true</span><br>
+        <span class="kw">true</span> <span class="op">&&</span> <span class="kw">false</span>   <span class="cmt">// false</span><br>
+        <span class="val">5</span> <span class="op">&&</span> <span class="str">"Olá"</span>   <span class="cmt">// "Olá"</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">||</span>
+      <div class="card-name">OR (OU lógico)</div>
+      <div class="card-desc">Retorna o primeiro valor truthy ou o último valor se todos forem falsy.</div>
+      <div class="card-code">
+        <span class="kw">false</span> <span class="op">||</span> <span class="kw">true</span>  <span class="cmt">// true</span><br>
+        <span class="val">0</span> <span class="op">||</span> <span class="str">"padrão"</span> <span class="cmt">// "padrão"</span><br>
+        <span class="val">1</span> <span class="op">||</span> <span class="val">99</span>       <span class="cmt">// 1</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #ff6b6b">
+      <span class="card-symbol">!</span>
+      <div class="card-name">NOT (NÃO lógico)</div>
+      <div class="card-desc">Inverte o valor booleano do operando. Dois !! convertem para boolean.</div>
+      <div class="card-code">
+        <span class="op">!</span><span class="kw">true</span>    <span class="cmt">// false</span><br>
+        <span class="op">!</span><span class="kw">false</span>   <span class="cmt">// true</span><br>
+        <span class="op">!!</span><span class="val">0</span>      <span class="cmt">// false</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #7c6dfa">
+      <span class="card-symbol">??</span>
+      <div class="card-name">Nullish Coalescing</div>
+      <div class="card-desc">Retorna o lado direito apenas se o esquerdo for null ou undefined (ES2020+).</div>
+      <div class="card-code">
+        <span class="kw">null</span> <span class="op">??</span> <span class="str">"padrão"</span>     <span class="cmt">// "padrão"</span><br>
+        <span class="val">0</span> <span class="op">??</span> <span class="str">"padrão"</span>        <span class="cmt">// 0 ✓</span><br>
+        <span class="kw">undefined</span> <span class="op">??</span> <span class="val">42</span> <span class="cmt">// 42</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- OUTROS -->
+<section class="section" id="outros">
+  <div class="reveal">
+    <div class="section-label">// 05</div>
+    <h2 class="section-title">Outros <em>Operadores</em></h2>
+  </div>
+  <div class="cards">
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">?:</span>
+      <div class="card-name">Ternário</div>
+      <div class="card-desc">Forma compacta de if/else. Condição ? valor_verdadeiro : valor_falso.</div>
+      <div class="card-code">
+        <span class="kw">const</span> msg <span class="op">=</span> idade <span class="op">&gt;=</span> <span class="val">18</span><br>
+        &nbsp;&nbsp;<span class="op">?</span> <span class="str">"Maior"</span><br>
+        &nbsp;&nbsp;<span class="op">:</span> <span class="str">"Menor"</span>;
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">?.</span>
+      <div class="card-name">Optional Chaining</div>
+      <div class="card-desc">Acessa propriedade aninhada sem lançar erro se o objeto for null/undefined (ES2020+).</div>
+      <div class="card-code">
+        <span class="kw">const</span> zip <span class="op">=</span> user<span class="op">?.</span>address<span class="op">?.</span>zip;<br>
+        <span class="cmt">// undefined (sem erro!)</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #7c6dfa">
+      <span class="card-symbol">typeof</span>
+      <div class="card-name">Tipo do valor</div>
+      <div class="card-desc">Retorna uma string indicando o tipo do operando.</div>
+      <div class="card-code">
+        <span class="kw">typeof</span> <span class="val">42</span>       <span class="cmt">// "number"</span><br>
+        <span class="kw">typeof</span> <span class="str">"Olá"</span>   <span class="cmt">// "string"</span><br>
+        <span class="kw">typeof</span> <span class="kw">true</span>    <span class="cmt">// "boolean"</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #ff6b6b">
+      <span class="card-symbol">instanceof</span>
+      <div class="card-name">Instância de</div>
+      <div class="card-desc">Verifica se um objeto é instância de uma classe ou construtor.</div>
+      <div class="card-code">
+        [] <span class="kw">instanceof</span> Array   <span class="cmt">// true</span><br>
+        {} <span class="kw">instanceof</span> Object  <span class="cmt">// true</span><br>
+        <span class="str">"x"</span> <span class="kw">instanceof</span> Array <span class="cmt">// false</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #4ff0b7">
+      <span class="card-symbol">in</span>
+      <div class="card-name">Propriedade existe</div>
+      <div class="card-desc">Retorna true se a propriedade especificada existe no objeto.</div>
+      <div class="card-code">
+        <span class="str">"nome"</span> <span class="kw">in</span> {nome: <span class="str">"Ana"</span>} <span class="cmt">// true</span><br>
+        <span class="val">0</span> <span class="kw">in</span> [<span class="val">10</span>, <span class="val">20</span>]        <span class="cmt">// true</span>
+      </div>
+    </div>
+    <div class="card reveal" style="--card-accent: #f7c948">
+      <span class="card-symbol">...</span>
+      <div class="card-name">Spread / Rest</div>
+      <div class="card-desc">Espalha elementos de um iterável ou agrupa parâmetros restantes.</div>
+      <div class="card-code">
+        <span class="kw">const</span> b <span class="op">=</span> [<span class="op">...</span>a, <span class="val">4</span>, <span class="val">5</span>]; <span class="cmt">// spread</span><br>
+        <span class="kw">function</span> f(<span class="op">...</span>args) {}  <span class="cmt">// rest</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PLAYGROUND -->
+<section class="section" id="playground">
+  <div class="reveal">
+    <div class="section-label">// 06</div>
+    <h2 class="section-title">Playground <em>Interativo</em></h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:2rem;font-family:'JetBrains Mono',monospace;">
+      Teste operadores em tempo real. Digite valores e veja o resultado.
+    </p>
+  </div>
+  <div class="playground reveal">
+    <div class="playground-header">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="playground-title">operadores.js — playground</span>
+    </div>
+    <div class="playground-body">
+      <div class="play-group">
+        <label>VALOR A</label>
+        <input type="text" id="valA" value="10" placeholder="ex: 10, 'texto', true">
+      </div>
+      <div class="play-group">
+        <label>VALOR B</label>
+        <input type="text" id="valB" value="3" placeholder="ex: 3, 'outro', false">
+      </div>
+      <div class="play-group">
+        <label>OPERADOR</label>
+        <select id="opSelect">
+          <optgroup label="Aritméticos">
+            <option value="+">+ (Adição)</option>
+            <option value="-">- (Subtração)</option>
+            <option value="*">* (Multiplicação)</option>
+            <option value="/"># / (Divisão)</option>
+            <option value="%">% (Módulo)</option>
+            <option value="**">** (Exponenciação)</option>
+          </optgroup>
+          <optgroup label="Comparação">
+            <option value="==">== (Igualdade solta)</option>
+            <option value="===">== (Igualdade estrita)</option>
+            <option value="!=">!= (Desigualdade solta)</option>
+            <option value="!==">!== (Desigualdade estrita)</option>
+            <option value=">"> > (Maior que)</option>
+            <option value=">=">>=  (Maior ou igual)</option>
+            <option value="<"> < (Menor que)</option>
+            <option value="<="><= (Menor ou igual)</option>
+          </optgroup>
+          <optgroup label="Lógicos">
+            <option value="&&">&& (AND)</option>
+            <option value="||">|| (OR)</option>
+            <option value="??">?? (Nullish)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="play-group" style="display:flex;align-items:flex-end">
+        <button onclick="calcular()" style="
+          width:100%;
+          background:var(--accent);
+          color:#000;
+          border:none;
+          border-radius:8px;
+          padding:0.65rem 1rem;
+          font-family:'JetBrains Mono',monospace;
+          font-weight:700;
+          font-size:0.85rem;
+          cursor:pointer;
+          transition:opacity 0.2s;
+        " onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+          ▶ Executar
+        </button>
+      </div>
+      <div class="play-result" id="playResult">
+        <div class="expr">// resultado aparecerá aqui</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Feito com <span>♥</span> para aprender JavaScript &nbsp;·&nbsp; Operadores JS Reference
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Playground
+  function calcular() {
+    const rawA = document.getElementById('valA').value.trim();
+    const rawB = document.getElementById('valB').value.trim();
+    const op = document.getElementById('opSelect').value;
+    const result = document.getElementById('playResult');
+
+    let a, b, res, expr;
+
+    try {
+      a = Function('"use strict"; return (' + rawA + ')')();
+    } catch { a = rawA; }
+    try {
+      b = Function('"use strict"; return (' + rawB + ')')();
+    } catch { b = rawB; }
+
+    const opClean = op.replace(/^#\s*/, '');
+
+    try {
+      res = Function('"use strict"; return ((' + JSON.stringify(a) + ') ' + opClean + ' (' + JSON.stringify(b) + '))')();
+      expr = rawA + ' ' + opClean + ' ' + rawB;
+      result.innerHTML = `
+        <div class="expr">// ${expr}</div>
+        <div class="out">${JSON.stringify(res)}</div>
+        <div class="type">typeof resultado: ${typeof res}</div>
+      `;
+    } catch (err) {
+      result.innerHTML = `
+        <div class="expr">// erro ao calcular</div>
+        <div class="out" style="color:var(--accent3)">⚠ ${err.message}</div>
+      `;
+    }
+  }
+
+  document.querySelectorAll('#valA, #valB').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+  });
+</script>
+</body>
+</html>
